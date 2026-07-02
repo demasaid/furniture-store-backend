@@ -3,39 +3,35 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class MainDao extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-
-  // Open database connection when the app starts
+  
+  // This runs when the app starts and opens the connection with the database
   async onModuleInit() {
     await this.$connect();
   }
 
-  // Close database connection when the app stops
+  // This runs when the app stops and closes the database connection safely
   async onModuleDestroy() {
     await this.$disconnect();
   }
 
- 
-  // FURNITURE
-
-
-  // Get all furniture items
+  // This gets all furniture items from the database
   findAllFurniture() {
     return this.furniture.findMany();
   }
 
-  // Get one furniture item by id
+  // This gets one furniture item using its id
   findFurnitureById(id: number) {
     return this.furniture.findUnique({
       where: { id },
     });
   }
 
-  // Create a new furniture item
+  // This adds a new furniture item to the database
   createFurniture(data: any) {
     return this.furniture.create({ data });
   }
 
-  // Update an existing furniture item
+  // This updates an existing furniture item using its id
   updateFurniture(id: number, data: any) {
     return this.furniture.update({
       where: { id },
@@ -43,14 +39,14 @@ export class MainDao extends PrismaClient implements OnModuleInit, OnModuleDestr
     });
   }
 
-  // Delete a furniture item
+  // This deletes a furniture item from the database using its id
   deleteFurniture(id: number) {
     return this.furniture.delete({
       where: { id },
     });
   }
 
-  // Search furniture by filters (name, category, price range)
+  // This searches for furniture items by name, category, or price range
   searchFurniture(filters: {
     name?: string;
     category?: any;
@@ -63,7 +59,7 @@ export class MainDao extends PrismaClient implements OnModuleInit, OnModuleDestr
           ? { contains: filters.name, mode: 'insensitive' }
           : undefined,
 
-        category: filters.category,
+        category: filters.category || undefined,
 
         price: {
           gte: filters.minPrice,
@@ -73,36 +69,138 @@ export class MainDao extends PrismaClient implements OnModuleInit, OnModuleDestr
     });
   }
 
-  
-  // USER
-
-  // Create a new user
-  createUser(data: any) {
-    return this.user.create({ data });
+  // This gets all users from the database
+  findAllUsers() {
+    return this.user.findMany();
   }
 
-  // Find user by email
+  // This gets one user using the user id
+  findUserById(id: number) {
+    return this.user.findUnique({
+      where: { id },
+    });
+  }
+
+  // This searches for a user using the email address
   findUserByEmail(email: string) {
     return this.user.findUnique({
       where: { email },
     });
   }
 
-  
-  // CART
- 
+  // This creates a new user in the database
+  createUser(data: any) {
+    return this.user.create({ data });
+  }
 
-  // Add item to cart
+  // This updates an existing user using the user id
+  updateUser(id: number, data: any) {
+    return this.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  // This deletes a user from the database using the user id
+  deleteUser(id: number) {
+    return this.user.delete({
+      where: { id },
+    });
+  }
+
+  // This gets the cart that belongs to a specific user
+  findCartByUserId(userId: number) {
+    return this.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            furniture: true,
+          },
+        },
+      },
+    });
+  }
+
+  // This creates a new empty cart for a user
+  createCart(userId: number) {
+    return this.cart.create({
+      data: { userId },
+    });
+  }
+
+  // This checks if a specific furniture item already exists inside a cart
+  findCartItem(cartId: number, furnitureId: number) {
+    return this.cartItem.findFirst({
+      where: {
+        cartId,
+        furnitureId,
+      },
+    });
+  }
+
+  // This adds a new item to the cart
   createCartItem(data: any) {
     return this.cartItem.create({ data });
   }
 
+  // This updates the quantity of an item inside the cart
+  updateCartItem(id: number, quantity: number) {
+    return this.cartItem.update({
+      where: { id },
+      data: { quantity },
+    });
+  }
+
+  // This removes one item from the cart
+  deleteCartItem(id: number) {
+    return this.cartItem.delete({
+      where: { id },
+    });
+  }
+
+  // This removes all items from a specific cart
+  clearCart(cartId: number) {
+    return this.cartItem.deleteMany({
+      where: { cartId },
+    });
+  }
+
+  // This gets all orders from the database
+  findAllOrders() {
+    return this.order.findMany();
+  }
+
+  // This gets all orders that belong to one user
+  findOrdersByUserId(userId: number) {
+    return this.order.findMany({
+      where: { userId },
+    });
+  }
+
+  // This gets one order using the order id
+  findOrderById(id: number) {
+    return this.order.findUnique({
+      where: { id },
+    });
+  }
+
   
-  // ORDER
+  // This creates a new order with all the items that were bought
+createOrder(data: any) {
+  return this.order.create({
+    data,
+    include: {
+      items: true,
+    },
+  });
+}
 
-
-  // Create a new order
-  createOrder(data: any) {
-    return this.order.create({ data });
+  // This updates the status of an existing order
+  updateOrderStatus(id: number, status: any) {
+    return this.order.update({
+      where: { id },
+      data: { status },
+    });
   }
 }
