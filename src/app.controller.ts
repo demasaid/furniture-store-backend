@@ -215,4 +215,21 @@ export class OrderController {
   ) {
     return this.furnitureService.updateOrderStatus(id, body.status);
   }
+
+
+@Get('random')
+getrandomnumber() {
+  return Math.floor(Math.random() * 100) + 1;
+}
+
+ @Get('number/:num')
+  getNumber(@Param('num') num: string) {
+    return  Number(num) *Number(num) ;
+
+  }
+
+  @Get('id/:id')
+  getDataById(@Param('id') id: string) {
+    return this.furnitureService.findUserById(id);
+  }
 }

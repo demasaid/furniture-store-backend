@@ -1,17 +1,7 @@
 
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-
-@Injectable()
-export class AppService {
-  getHello(): string {
-    return `
-    <h1> Dema </h1>
-    <h3> Saed </h3>
-    `;
-  }
-}
-
 import { MainDao } from './dao';
+import { usersData } from './data';
 
 @Injectable()
 export class FurnitureService {
@@ -332,4 +322,10 @@ async updateOrderStatus(id: number, status: any) {
 
   return this.mainDao.updateOrderStatus(id, status);
 }
+
+
+
+  findUserById(id: string) {
+    return  usersData.find((item) => item.id === id);
+  }
 }
