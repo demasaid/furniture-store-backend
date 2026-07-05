@@ -1,24 +1,12 @@
 import { Module } from '@nestjs/common';
-import {
-  AppController,
-  FurnitureController,
-  UserController,
-  CartController,
-  OrderController,
-} from './app.controller';
+import { AppController } from './app.controller';
 
-import { FurnitureService } from './app.service';
-import { MainDao } from './dao';
+import { FurnitureModule } from './furniture/furniture.module';
+import { UsersModule } from './users/users.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
-  imports: [],
-  controllers: [
-    AppController,
-    FurnitureController,
-    UserController,
-    CartController,
-    OrderController,
-  ],
-  providers: [FurnitureService, MainDao],
+  imports: [FurnitureModule, UsersModule, CartModule],
+  controllers: [AppController],
 })
 export class AppModule {}
