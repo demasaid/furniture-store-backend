@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { usersData } from './data';
 
 @Injectable()
-export class FurnitureService {
+export class AppService {
   constructor() {}
 
   findUserById(id: string) {
