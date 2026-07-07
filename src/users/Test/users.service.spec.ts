@@ -11,6 +11,8 @@ describe('UsersService', () => {
     createUser: jest.fn(),
     updateUser: jest.fn(),
     deleteUser: jest.fn(),
+    getAllUsers: jest.fn(),
+    getUserById: jest.fn(),
   };
 
   beforeEach(async () => {
