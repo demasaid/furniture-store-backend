@@ -5,6 +5,6 @@ import { FurnitureDao } from './furniture.dao';
 
 @Module({
   controllers: [FurnitureController],
-  providers: [FurnitureService],
+  providers: [FurnitureService, FurnitureDao],
 })
 export class FurnitureModule {}
