@@ -6,15 +6,12 @@ describe('UsersService', () => {
   let service: UsersService;
 
   const mockUsersDao = {
-    findAllUsers: jest.fn(),
-    findUserById: jest.fn(),
-    createUser: jest.fn(),
-    updateUser: jest.fn(),
-    deleteUser: jest.fn(),
-    getAllUsers: jest.fn(),
-    getUserById: jest.fn(),
-  };
-
+  getAllUsers: jest.fn(),
+  getUserById: jest.fn(),
+  createUser: jest.fn(),
+  updateUser: jest.fn(),
+  deleteUser: jest.fn(),
+};
   beforeEach(async () => {
     jest.clearAllMocks();
 
@@ -36,40 +33,40 @@ describe('UsersService', () => {
   });
 
   it('should return all users', async () => {
-    const users = [
-      {
-        id: 1,
-        name: 'Dema Saed',
-        email: 'dema@example.com',
-        password: '123456',
-        address: 'Haifa',
-      },
-    ];
-
-    mockUsersDao.findAllUsers.mockResolvedValue(users);
-
-    const result = await service.getAllUsers();
-
-    expect(result).toEqual(users);
-    expect(mockUsersDao.findAllUsers).toHaveBeenCalled();
-  });
-
-  it('should return user by id', async () => {
-    const user = {
+  const users = [
+    {
       id: 1,
       name: 'Dema Saed',
       email: 'dema@example.com',
       password: '123456',
       address: 'Haifa',
-    };
+    },
+  ];
 
-    mockUsersDao.findUserById.mockResolvedValue(user);
+  mockUsersDao.getAllUsers.mockResolvedValue(users);
 
-    const result = await service.getUserById(1);
+  const result = await service.getAllUsers();
 
-    expect(result).toEqual(user);
-    expect(mockUsersDao.findUserById).toHaveBeenCalledWith(1);
-  });
+  expect(result).toEqual(users);
+  expect(mockUsersDao.getAllUsers).toHaveBeenCalled();
+});
+
+  it('should return user by id', async () => {
+  const user = {
+    id: 1,
+    name: 'Dema Saed',
+    email: 'dema@example.com',
+    password: '123456',
+    address: 'Haifa',
+  };
+
+  mockUsersDao.getUserById.mockResolvedValue(user);
+
+  const result = await service.getUserById(1);
+
+  expect(result).toEqual(user);
+  expect(mockUsersDao.getUserById).toHaveBeenCalledWith(1);
+});
 
   it('should create user', async () => {
     const data = {
@@ -93,41 +90,49 @@ describe('UsersService', () => {
   });
 
   it('should update user', async () => {
-    const data = {
-      name: 'Dema Updated',
-      address: 'Tel Aviv',
-    };
+  const user = {
+    id: 1,
+    name: 'Dema Saed',
+    email: 'dema@example.com',
+    password: '123456',
+    address: 'Haifa',
+  };
 
-    const updatedUser = {
-      id: 1,
-      name: 'Dema Updated',
-      email: 'dema@example.com',
-      password: '123456',
-      address: 'Tel Aviv',
-    };
+  const updateData = {
+    name: 'Dema Updated',
+  };
 
-    mockUsersDao.updateUser.mockResolvedValue(updatedUser);
+  const updatedUser = {
+    ...user,
+    ...updateData,
+  };
 
-    const result = await service.updateUser(1, data);
+  mockUsersDao.getUserById.mockResolvedValue(user);
+  mockUsersDao.updateUser.mockResolvedValue(updatedUser);
 
-    expect(result).toEqual(updatedUser);
-    expect(mockUsersDao.updateUser).toHaveBeenCalledWith(1, data);
-  });
+  const result = await service.updateUser(1, updateData);
 
-  it('should delete user', async () => {
-    const deletedUser = {
-      id: 1,
-      name: 'Dema Saed',
-      email: 'dema@example.com',
-      password: '123456',
-      address: 'Haifa',
-    };
+  expect(result).toEqual(updatedUser);
+  expect(mockUsersDao.getUserById).toHaveBeenCalledWith(1);
+  expect(mockUsersDao.updateUser).toHaveBeenCalledWith(1, updateData);
+});
+it('should delete user', async () => {
+  const user = {
+    id: 1,
+    name: 'Dema Saed',
+    email: 'dema@example.com',
+    password: '123456',
+    address: 'Haifa',
+  };
 
-    mockUsersDao.deleteUser.mockResolvedValue(deletedUser);
+  mockUsersDao.getUserById.mockResolvedValue(user);
+  mockUsersDao.deleteUser.mockResolvedValue(user);
 
-    const result = await service.deleteUser(1);
+  const result = await service.deleteUser(1);
 
-    expect(result).toEqual(deletedUser);
-    expect(mockUsersDao.deleteUser).toHaveBeenCalledWith(1);
-  });
+  expect(result).toEqual(user);
+  expect(mockUsersDao.getUserById).toHaveBeenCalledWith(1);
+  expect(mockUsersDao.deleteUser).toHaveBeenCalledWith(1);
+});
+
 });
