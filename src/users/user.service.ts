@@ -19,6 +19,15 @@ export class UsersService {
 
     return user;
   }
+   // Used internally during TFA verification.
+  async findAuthUserById(id: number) {
+    return this.userDao.getAuthUserById(id);
+  }
+
+  // Used during signup and signin.
+  async findUserByEmail(email: string) {
+    return this.userDao.getUserByEmail(email);
+  }
 
   async createUser(data: any) {
     if (!data.name || !data.email || !data.password) {
@@ -47,4 +56,5 @@ export class UsersService {
 
     return this.userDao.deleteUser(id);
   }
+
 }
