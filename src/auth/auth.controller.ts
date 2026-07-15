@@ -1,8 +1,6 @@
 import {
   Body,
   Controller,
-  HttpCode,
-  HttpStatus,
   Post,
 } from '@nestjs/common';
 
@@ -17,21 +15,21 @@ export class AuthController {
     private readonly authService: AuthService,
   ) {}
 
+
   @Post('signup')
-  @HttpCode(HttpStatus.CREATED)
-  signup(@Body() signupDto: SignupDto) {
-    return this.authService.signup(signupDto);
+  signup(@Body() Data: SignupDto) {
+    return this.authService.signup(Data);
   }
 
   @Post('signin')
-  @HttpCode(HttpStatus.OK)
-  signin(@Body() signinDto: SigninDto) {
-    return this.authService.signin(signinDto);
+  signin(@Body() Data: SigninDto) {
+    return this.authService.signin(Data);
   }
 
   @Post('tfa')
-  @HttpCode(HttpStatus.OK)
-  verifyTfa(@Body() verifyTfaDto: VerifyTfaDto) {
-    return this.authService.verifyTfa(verifyTfaDto);
+  verifyTfa(@Body() Data: VerifyTfaDto) {
+    return this.authService.verifyTfa(Data);
   }
+
+
 }
