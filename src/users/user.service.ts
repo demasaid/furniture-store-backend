@@ -56,5 +56,8 @@ export class UsersService {
 
     return this.userDao.deleteUser(id);
   }
+  findUserByPhone(phone: string) {
+    return this.userDao.findUserByPhone(phone);
+  }
 
 }
