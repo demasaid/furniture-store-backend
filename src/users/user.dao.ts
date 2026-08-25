@@ -82,4 +82,10 @@ export class UserDao extends PrismaClient {
       where: { id },
     });
   }
+  
+  findUserByPhone(phone: string) {
+    return this.user.findUnique({
+      where: { phone },
+    });
+}
 }
