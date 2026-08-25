@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { OrderStatus } from '@prisma/client';
 import { CartDao } from './cart.dao';
 
 @Injectable()
@@ -53,10 +54,20 @@ export class CartService {
       furnitureId,
     );
 
+    // The total amount requested (what's already in the cart plus what's
+    // being added now) can never exceed what's actually in stock.
+    const totalRequested = (existingItem?.quantity ?? 0) + quantity;
+
+    if (totalRequested > furniture.quantity) {
+      throw new BadRequestException(
+        `Only ${furniture.quantity} unit(s) of this item are in stock`,
+      );
+    }
+
     if (existingItem) {
       await this.cartDao.updateCartItemQuantity(
         existingItem.id,
-        existingItem.quantity + quantity,
+        totalRequested,
       );
     } else {
       await this.cartDao.createCartItem(
@@ -90,6 +101,14 @@ export class CartService {
 
     if (!item) {
       throw new NotFoundException('Item not found in cart');
+    }
+
+    const furniture = await this.cartDao.findFurnitureById(furnitureId);
+
+    if (!furniture || quantity > furniture.quantity) {
+      throw new BadRequestException(
+        `Only ${furniture?.quantity ?? 0} unit(s) of this item are in stock`,
+      );
     }
 
     await this.cartDao.updateCartItemQuantity(item.id, quantity);
@@ -166,7 +185,7 @@ export class CartService {
   }
 
   // This updates the order status
-  async updateOrderStatus(id: number, status: any) {
+  async updateOrderStatus(id: number, status: OrderStatus) {
     const order = await this.cartDao.getOrderById(id);
 
     if (!order) {

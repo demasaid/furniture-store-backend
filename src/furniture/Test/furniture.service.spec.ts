@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { FurnitureCategory } from '@prisma/client';
 import { FurnitureService } from '../furniture.service';
 import { FurnitureDao } from '../furniture.dao';
 
@@ -81,7 +82,7 @@ describe('FurnitureService', () => {
       price: 500,
       dimensions: '180x90x75',
       quantity: 5,
-      category: 'TABLE',
+      category: FurnitureCategory.TABLE,
     };
 
     const createdFurniture = {

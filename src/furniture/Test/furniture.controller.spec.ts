@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { FurnitureCategory } from '@prisma/client';
 import { FurnitureController } from '../furniture.controller';
 import { FurnitureService } from '../furniture.service';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 describe('FurnitureController', () => {
   let controller: FurnitureController;
@@ -26,7 +28,10 @@ describe('FurnitureController', () => {
           useValue: mockFurnitureService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<FurnitureController>(FurnitureController);
   });
@@ -129,7 +134,7 @@ describe('FurnitureController', () => {
       price: 500,
       dimensions: '180x90x75',
       quantity: 5,
-      category: 'TABLE',
+      category: FurnitureCategory.TABLE,
     };
 
     const createdFurniture = {

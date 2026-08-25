@@ -7,9 +7,17 @@ import {
   Patch,
   Post,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './user.service';
 
+// Every route here needs a valid login -- there is no reason a stranger
+// should be able to list every user or delete someone's account.
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -28,15 +36,15 @@ export class UsersController {
 
   // This creates a new user
   @Post()
-  createUser(@Body() data: any) {
-    return this.usersService.createUser(data);
+  createUser(@Body() data: CreateUserDto) {
+    return this.usersService.createUserAccount(data);
   }
 
   // This updates an existing user
   @Patch(':id')
   updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: any,
+    @Body() data: UpdateUserDto,
   ) {
     return this.usersService.updateUser(id, data);
   }

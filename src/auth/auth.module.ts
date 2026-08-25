@@ -1,44 +1,16 @@
 import { Module } from '@nestjs/common';
-import {
-  ConfigModule,
-  ConfigService,
-} from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
 
+import { JwtConfigModule } from '../common/jwt-config.module';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 import { OtpService } from './otp.service';
 
 @Module({
   imports: [
     UsersModule,
-
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-
-      useFactory: (
-        configService: ConfigService,
-      ) => {
-        const jwtSecret =
-          configService.get<string>('JWT_SECRET');
-
-        if (!jwtSecret) {
-          throw new Error(
-            'JWT_SECRET is missing from the .env file',
-          );
-        }
-
-        return {
-          secret: jwtSecret,
-
-          signOptions: {
-            expiresIn: 3600,
-          },
-        };
-      },
-    }),
+    JwtConfigModule,
   ],
 
   controllers: [AuthController],
@@ -46,6 +18,11 @@ import { OtpService } from './otp.service';
   providers: [
     AuthService,
     OtpService,
+    JwtAuthGuard,
   ],
+
+  // Exported so other modules (users, cart, furniture) can use
+  // JwtAuthGuard to protect their own routes.
+  exports: [JwtAuthGuard],
 })
 export class AuthModule {}

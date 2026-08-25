@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from '../users.controller';
 import { UsersService } from '../user.service';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -8,7 +9,7 @@ describe('UsersController', () => {
   const mockUsersService = {
     getAllUsers: jest.fn(),
     getUserById: jest.fn(),
-    createUser: jest.fn(),
+    createUserAccount: jest.fn(),
     updateUser: jest.fn(),
     deleteUser: jest.fn(),
   };
@@ -24,7 +25,14 @@ describe('UsersController', () => {
           useValue: mockUsersService,
         },
       ],
-    }).compile();
+    })
+      // JwtAuthGuard needs a real JwtService to be constructed. These
+      // tests call controller methods directly (no HTTP layer), so the
+      // guard never actually runs -- we only override it here so Nest
+      // can compile the module without needing JWT_SECRET/JwtService.
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<UsersController>(UsersController);
   });
@@ -37,9 +45,9 @@ describe('UsersController', () => {
     const users = [
       {
         id: 1,
-        name: 'Dema Saed',
+        firstName: 'Dema',
+        lastName: 'Saed',
         email: 'dema@example.com',
-        password: '123456',
         address: 'Haifa',
       },
     ];
@@ -55,9 +63,9 @@ describe('UsersController', () => {
   it('should return user by id', async () => {
     const user = {
       id: 1,
-      name: 'Dema Saed',
+      firstName: 'Dema',
+      lastName: 'Saed',
       email: 'dema@example.com',
-      password: '123456',
       address: 'Haifa',
     };
 
@@ -71,36 +79,40 @@ describe('UsersController', () => {
 
   it('should create user', async () => {
     const data = {
-      name: 'Dema Saed',
+      firstName: 'Dema',
+      lastName: 'Saed',
       email: 'dema@example.com',
-      password: '123456',
+      password: 'password123',
       address: 'Haifa',
     };
 
     const createdUser = {
       id: 1,
-      ...data,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      address: data.address,
     };
 
-    mockUsersService.createUser.mockResolvedValue(createdUser);
+    mockUsersService.createUserAccount.mockResolvedValue(createdUser);
 
     const result = await controller.createUser(data);
 
     expect(result).toEqual(createdUser);
-    expect(mockUsersService.createUser).toHaveBeenCalledWith(data);
+    expect(mockUsersService.createUserAccount).toHaveBeenCalledWith(data);
   });
 
   it('should update user', async () => {
     const data = {
-      name: 'Dema Updated',
+      firstName: 'Dema',
       address: 'Tel Aviv',
     };
 
     const updatedUser = {
       id: 1,
-      name: 'Dema Updated',
+      firstName: 'Dema',
+      lastName: 'Saed',
       email: 'dema@example.com',
-      password: '123456',
       address: 'Tel Aviv',
     };
 
@@ -115,9 +127,9 @@ describe('UsersController', () => {
   it('should delete user', async () => {
     const deletedUser = {
       id: 1,
-      name: 'Dema Saed',
+      firstName: 'Dema',
+      lastName: 'Saed',
       email: 'dema@example.com',
-      password: '123456',
       address: 'Haifa',
     };
 

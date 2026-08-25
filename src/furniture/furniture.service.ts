@@ -1,4 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateFurnitureDto } from './dto/create-furniture.dto';
+import { UpdateFurnitureDto } from './dto/update-furniture.dto';
 import { FurnitureDao } from './furniture.dao';
 
 @Injectable()
@@ -20,25 +22,16 @@ export class FurnitureService {
     return item;
   }
   
-  // This creates a new furniture item after checking the important values
-  async createFurniture(data: any) {
-    if (!data.name) {
-      throw new BadRequestException('Furniture name is required');
-    }
-  
-    if (data.price <= 0) {
-      throw new BadRequestException('Price must be greater than zero');
-    }
-  
-    if (data.quantity < 0) {
-      throw new BadRequestException('Quantity cannot be negative');
-    }
-  
+  // This creates a new furniture item.
+  // CreateFurnitureDto (validated by the global ValidationPipe) already
+  // guarantees name/price/quantity are present and well-formed, so this
+  // no longer needs to re-check them by hand.
+  async createFurniture(data: CreateFurnitureDto) {
     return this.furnitureDao.createFurniture(data);
   }
-  
+
   // This updates a furniture item only after we make sure it exists
-  async updateFurniture(id: number, data: any) {
+  async updateFurniture(id: number, data: UpdateFurnitureDto) {
     await this.getFurnitureById(id);
   
     return this.furnitureDao.updateFurniture(id, data);

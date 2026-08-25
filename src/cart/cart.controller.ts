@@ -7,9 +7,19 @@ import {
   Patch,
   Post,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { CartService } from './cart.service';
 
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CartService } from './cart.service';
+import { AddItemDto } from './dto/add-item.dto';
+import { RemoveItemDto } from './dto/remove-item.dto';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+
+// A cart and its orders always belong to one specific user, so every
+// route here requires a valid login.
+@UseGuards(JwtAuthGuard)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
@@ -26,14 +36,7 @@ export class CartController {
 
   // Add furniture item to cart
   @Post('add')
-  addItemToCart(
-    @Body()
-    body: {
-      userId: number;
-      furnitureId: number;
-      quantity: number;
-    },
-  ) {
+  addItemToCart(@Body() body: AddItemDto) {
     return this.cartService.addItemToCart(
       body.userId,
       body.furnitureId,
@@ -43,14 +46,7 @@ export class CartController {
 
   // Update cart item quantity
   @Patch('update')
-  updateCartItem(
-    @Body()
-    body: {
-      userId: number;
-      furnitureId: number;
-      quantity: number;
-    },
-  ) {
+  updateCartItem(@Body() body: UpdateCartItemDto) {
     return this.cartService.updateCartItemQuantity(
       body.userId,
       body.furnitureId,
@@ -60,13 +56,7 @@ export class CartController {
 
   // Remove item from cart
   @Delete('remove')
-  removeItemFromCart(
-    @Body()
-    body: {
-      userId: number;
-      furnitureId: number;
-    },
-  ) {
+  removeItemFromCart(@Body() body: RemoveItemDto) {
     return this.cartService.removeItemFromCart(
       body.userId,
       body.furnitureId,
@@ -111,7 +101,7 @@ export class CartController {
   @Patch('orders/:orderId/status')
   updateOrderStatus(
     @Param('orderId', ParseIntPipe) orderId: number,
-    @Body() body: { status: any },
+    @Body() body: UpdateOrderStatusDto,
   ) {
     return this.cartService.updateOrderStatus(orderId, body.status);
   }

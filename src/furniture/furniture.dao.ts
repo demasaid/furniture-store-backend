@@ -1,5 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class FurnitureDao
@@ -26,12 +26,12 @@ export class FurnitureDao
   }
 
   // This adds a new furniture item to the database
-  createFurniture(data: any) {
+  createFurniture(data: Prisma.FurnitureCreateInput) {
     return this.furniture.create({ data });
   }
 
   // This updates an existing furniture item using its id
-  updateFurniture(id: number, data: any) {
+  updateFurniture(id: number, data: Prisma.FurnitureUpdateInput) {
     return this.furniture.update({
       where: { id },
       data,

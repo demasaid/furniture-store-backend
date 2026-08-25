@@ -1,5 +1,5 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { OrderStatus, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class CartDao
@@ -204,10 +204,21 @@ export class CartDao
       },
     });
 
+    // Stock was only ever checked when items were added to the cart --
+    // it was never actually reduced, so the same furniture could be
+    // "bought" over and over without ever running out. Reduce it now
+    // that the order is confirmed.
+    for (const item of cart.items) {
+      await this.furniture.update({
+        where: { id: item.furnitureId },
+        data: { quantity: { decrement: item.quantity } },
+      });
+    }
+
     return order;
   }
 
-  updateOrderStatus(id: number, status: any) {
+  updateOrderStatus(id: number, status: OrderStatus) {
     return this.order.update({
       where: { id },
       data: { status },
